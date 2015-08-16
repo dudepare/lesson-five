@@ -14,12 +14,12 @@ Check our RESOURCES.md for some links we think you'll find handy.
 
 ## Homework Checklist
 
-- [ ] [Fork this repository][gh-fork]
-- [ ] Clone the repo to your own machine
-- [ ] Use the virtualenv you created in previous lesson
-- [ ] Convert time-tracker forms and views to ModelForms and Generic Class Based Views
-- [ ] Bonus 1: Create a RedirectView to redirect visitors from the root of the site (/) to the /clients/ page
-- [ ] Bonus 2: Add a button to the "entries" form (/entries/) called "Create Entry with End Now"
+- [x] [Fork this repository][gh-fork]
+- [x] Clone the repo to your own machine
+- [x] Use the virtualenv you created in previous lesson
+- [x] Convert time-tracker forms and views to ModelForms and Generic Class Based Views
+- [x] Bonus 1: Create a RedirectView to redirect visitors from the root of the site (/) to the /clients/ page
+- [x] Bonus 2: Add a button to the "entries" form (/entries/) called "Create Entry with End Now"
   - This button should be an alternative submit button that automatically sets the end time to be the current time
 
 When you've completed some or all of the homework please make a [Pull Request][gh-pr] against this repository. If you submit your work before Wednesday evening we'll give you feedback before the next class.

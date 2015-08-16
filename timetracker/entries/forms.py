@@ -1,23 +1,31 @@
 from django import forms
 from django.utils import timezone
 
-from .models import Project, Client
+from .models import Project, Client, Entry
 
 
-class ClientForm(forms.Form):
-    name = forms.CharField()
+class ClientForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = ('name',)
 
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ('name', 'client')
 
-class ProjectForm(forms.Form):
-	name = forms.CharField()
-	client = forms.ModelChoiceField(queryset=Client.objects.all())
+class EntryForm(forms.ModelForm):
+    class Meta:
+        model = Entry
+        fields = '__all__'
 
+    def save(self, commit=True):
+        entry = super(EntryForm, self).save(commit=False)
 
-class EntryForm(forms.Form):
-    start = forms.DateTimeField(label="Start Time", help_text="Format: 2006-10-25 14:30")
-    stop = forms.DateTimeField(label="End Time", help_text="Format: 2006-10-25 14:30")
-    project = forms.ModelChoiceField(queryset=Project.objects.all())
-    description = forms.CharField()
+        if commit:
+            entry.save()
+
+        return entry
 
     def clean_start(self):
         """
@@ -39,11 +47,15 @@ class EntryForm(forms.Form):
         # is preserved
         cleaned_data = super(EntryForm, self).clean()
 
-        # Get the start and end values from the cleaned_data dictionary, or None
+        # Get the start and stop values from the cleaned_data dictionary, or None
         # if the dictionary keys are missing
         start = cleaned_data.get('start', None)
-        end = cleaned_data.get('end', None)
+        stop = cleaned_data.get('stop', None)
+        if 'create_endnow' in self.data:
+            stop = timezone.now()
+            cleaned_data['stop'] = stop
 
-        if end and start and (end < start):
+        if stop and start and (stop < start):
             raise forms.ValidationError('End time must come after start time')
-        # No need to return anything (Django 1.7 and above)
+
+        return cleaned_data

@@ -1,113 +1,69 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import CreateView, RedirectView, DetailView, UpdateView
+from django.core.urlresolvers import reverse
 
 from .forms import EntryForm, ProjectForm, ClientForm
 from .models import Client, Entry, Project
 
+class RootRedirectView(RedirectView):
+    permanent = False
 
-def clients(request):
-    if request.method == 'POST':
-        # Create our form object with our POST data
-        form = ClientForm(request.POST)
-        if form.is_valid():
-            # If the form is valid, create a client with submitted data
-            # Below is the shortcut equivalent of:
-            # client = Client()
-            # client.name = form.cleaned_data['name']
-            # client.save()
-            # Sometimes you don't want to save the object until the end,
-            # sometimes you don't care!
-            client = Client.objects.create(name=form.cleaned_data['name'])
-            return redirect('client-list')
-    else:
-        form = ClientForm()
+    def get_redirect_url(self):
+        return reverse('client-list')
 
-    client_list = Client.objects.all()
-    return render(request, 'clients.html', {
-        'client_list': client_list,
-        'form': form,
-    })
+class ClientCreateView(CreateView):
+    model = Client
+    template_name = 'clients.html'
+    form_class = ClientForm
 
+    def get_success_url(self):
+        return reverse('client-list')
 
-def client_detail(request, pk):
-    client = get_object_or_404(Client, pk=pk)
+    def get_context_data(self, **kwargs):
+        context = super(ClientCreateView, self).get_context_data(**kwargs)
+        # you still need to set the context client_list so your template could read the data
+        context['client_list'] = self.model.objects.all()
+        return context
 
-    if request.method == 'POST':
-        form = ClientForm(request.POST)
-        if form.is_valid():
-            # Update client details
-            client.name = form.cleaned_data['name']
-            client.save()
-            return redirect('client-list')
-    else:
-        # Initialise form with client data
-        form = ClientForm(initial={'name': client.name})
+class ClientUpdateView(UpdateView):
+    model = Client
+    template_name = 'client_detail.html'
+    form_class = ClientForm
 
-    return render(request, 'client_detail.html', {
-        'client': client,
-        'form': form,
-    })
+    def get_success_url(self):
+        return reverse('client-list')
 
+class EntriesCreateView(CreateView):
+    model = Entry
+    template_name = 'entries.html'
+    form_class = EntryForm 
 
-def entries(request):
-    if request.method == 'POST':
-        # Create our form object with our POST data
-        entry_form = EntryForm(request.POST)
-        if entry_form.is_valid():
-            # If the form is valid, let's create and Entry with the submitted data
-            entry = Entry()
-            entry.start = entry_form.cleaned_data['start']
-            entry.stop = entry_form.cleaned_data['stop']
-            entry.project = entry_form.cleaned_data['project']
-            entry.description = entry_form.cleaned_data['description']
-            entry.save()
-            return redirect('entry-list')
-    else:
-        entry_form = EntryForm()
+    def get_success_url(self):
+        return reverse('entry-list')
 
-    entry_list = Entry.objects.all()
-    return render(request, 'entries.html', {
-        'entry_list': entry_list,
-        'entry_form': entry_form,
-    })
+    def get_context_data(self, **kwargs):
+        context = super(EntriesCreateView, self).get_context_data(**kwargs)
+        context['entry_list'] = self.model.objects.all()
+        return context
+
+class ProjectsCreateView(CreateView):
+    model = Project
+    template_name = 'projects.html'
+    form_class = ProjectForm
+
+    def get_success_url(self):
+        return reverse('project-list')
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectsCreateView, self).get_context_data(**kwargs)
+        context['project_list'] = self.model.objects.all()
+        return context
 
 
-def projects(request):
-    if request.method == 'POST':
-        # Create our form object with our POST data
-        form = ProjectForm(request.POST)
-        if form.is_valid():
-            Project.objects.create(
-                name=form.cleaned_data['name'],
-                client=form.cleaned_data['client']
-            )
-            return redirect('project-list')
-    else:
-        form = ProjectForm()
+class ProjectUpdateView(UpdateView):
+    model = Project
+    template_name = 'project_detail.html'
+    form_class = ProjectForm
 
-    project_list = Project.objects.all()
-    return render(request, 'projects.html', {
-        'project_list': project_list,
-        'form': form
-    })
-
-
-def project_detail(request, pk):
-    project = get_object_or_404(Project, pk=pk)
-
-    if request.method == 'POST':
-        form = ProjectForm(request.POST)
-        if form.is_valid():
-            # Update project details
-            project.name = form.cleaned_data['name']
-            project.client=form.cleaned_data['client']
-            project.save()
-            return redirect('project-list')
-    else:
-        # Initialise form with project data
-        form = ProjectForm(initial={'name': project.name, 'client': project.client})
-
-    project = get_object_or_404(Project, pk=pk)
-    return render(request, 'project_detail.html', {
-        'project': project,
-        'form': form,
-    })
+    def get_success_url(self):
+        return reverse('project-list')

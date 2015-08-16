@@ -16,16 +16,31 @@
     <div class="panel-body">
       <form class="form-horizontal" method="post">
         {% csrf_token %}
-        {{ entry_form.as_p }}
-        <input class="btn btn-primary" type="submit" name="name" value="Create Entry">
+        {{ form.as_p }}
+        <input class="btn btn-primary" type="submit" name="create_entry" value="Create Entry">
+        <input class="btn btn-primary" type="submit" name="create_endnow" value="Create Entry with End Now">
       </form>
     </div>
 
   </div>
-
-  <ul class="list-group col-md-3">
-    {% for entry in entry_list %}
-      <li class="list-group-item">{{ entry.description }}</li>
-    {% endfor %}
-  </ul>
+  <table class="table table-striped col-md-6">
+        <thead>
+        <tr>
+            <th>Start</th>
+            <th>Stop</th>
+            <th>Project</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+      {% for entry in entry_list %}
+        <tr>
+            <td>{{entry.start}}</td>
+            <td>{{entry.stop}}</td>
+            <td>{{entry.project}}</td>
+            <td>{{entry.description}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}
