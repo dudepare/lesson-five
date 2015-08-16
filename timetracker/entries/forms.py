@@ -17,7 +17,11 @@ class ProjectForm(forms.ModelForm):
 class EntryForm(forms.ModelForm):
     class Meta:
         model = Entry
-        fields = '__all__'
+        fields = ('start', 'stop', 'project', 'description')
+        help_texts = {
+        'start': 'Format: 2006-10-25 14:30',
+        'stop': 'Format: 2006-10-25 14:30'
+        }
 
     def save(self, commit=True):
         entry = super(EntryForm, self).save(commit=False)
